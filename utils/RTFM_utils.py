@@ -2,6 +2,7 @@ import visdom
 import numpy as np
 import torch
 
+
 class Visualizer(object):
     def __init__(self, env='default', **kwargs):
         self.vis = visdom.Visdom(env=env, **kwargs)
@@ -19,25 +20,29 @@ class Visualizer(object):
                       **kwargs
                       )
         self.index[name] = x + 1
+
     def disp_image(self, name, img):
         self.vis.image(img=img, win=str(name), opts=dict(title=name))
-    def lines(self, name, line, X=None):
+
+    def lines(self, name, Y, X=None):
         if X is None:
-            self.vis.line(Y=line, win=str(name))
+            self.vis.line(Y=Y, win=str(name), opts=dict(title=name))
         else:
-            self.vis.line(X=X, Y=line, win=str(name))
+            self.vis.line(X=X, Y=Y, win=str(name), opts=dict(title=name))
+
     def scatter(self, name, data):
         self.vis.scatter(X=data, win=str(name))
 
+
 def process_feat(feat, length):
     new_feat = np.zeros((length, feat.shape[1])).astype(np.float32)
-    
-    r = np.linspace(0, len(feat), length+1, dtype=np.int)
+
+    r = np.linspace(0, len(feat), length + 1, dtype=np.int)
     for i in range(length):
-        if r[i]!=r[i+1]:
-            new_feat[i,:] = np.mean(feat[r[i]:r[i+1],:], 0)
+        if r[i] != r[i + 1]:
+            new_feat[i, :] = np.mean(feat[r[i]:r[i + 1], :], 0)
         else:
-            new_feat[i,:] = feat[r[i],:]
+            new_feat[i, :] = feat[r[i], :]
     return new_feat
 
 
@@ -83,15 +88,15 @@ def modelsize(model, input, type_size=4):
         nums = np.prod(np.array(s))
         total_nums += nums
 
-
     print('Model {} : intermedite variables: {:3f} M (without backward)'
           .format(model._get_name(), total_nums * type_size / 1000 / 1000))
     print('Model {} : intermedite variables: {:3f} M (with backward)'
-          .format(model._get_name(), total_nums * type_size*2 / 1000 / 1000))
+          .format(model._get_name(), total_nums * type_size * 2 / 1000 / 1000))
 
 
 def save_best_record(test_info, file_path):
     fo = open(file_path, "w")
     fo.write("epoch: {}\n".format(test_info["epoch"][-1]))
-    fo.write(str(test_info["test_AUC"][-1]))
+    fo.write("UCF auc: {}\n".format(str(test_info["UCF_AUC"][-1])))
+    fo.write("VAD3 auc: {}\n".format(str(test_info["VAD3_AUC"][-1])))
     fo.close()

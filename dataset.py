@@ -6,10 +6,10 @@ torch.set_default_tensor_type('torch.FloatTensor')
 
 
 class Dataset(data.Dataset):
-    def __init__(self, args, is_normal=True, transform=None, test_mode=False):
+    def __init__(self, args, is_normal=True, transform=None, test_mode=False, test_dataset='UCF'):
         self.modality = args.modality
         self.is_normal = is_normal
-        self.dataset = args.dataset
+        self.dataset = test_dataset
         self.type = args.feature_type
         self.transform = transform
         self.test_mode = test_mode
@@ -21,12 +21,12 @@ class Dataset(data.Dataset):
         # feature type
         if self.type == 'i3d':
             features_path = '/media/mount_loc/yiling/features/I3D_32Train_32Test'
-        else:
+        elif self.type == 'c3d':
             features_path = '/media/mount_loc/yiling/features/C3D_32Train_32Test'
         # test dataset
         if self.dataset == 'VAD3':
             test_annotation_path = '/media/mount_loc/yiling/annotation/VAD_test_annotation_with_frames.txt'
-        else:
+        elif self.dataset == 'UCF':
             test_annotation_path = '/media/mount_loc/yiling/annotation/UCF_test_annotation_with_frames.txt'
         # test or train
         if self.test_mode:

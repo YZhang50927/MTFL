@@ -60,3 +60,14 @@ def build_transforms(mode='c3d'):
     ])
 
     return res
+
+
+def get_feature_size(feature_type):
+    if feature_type == 'c3d':
+        feature_size = 4096
+    elif feature_type == 'i3d':
+        feature_size = 1024
+    else:  # default: I3D
+        feature_size = 1024
+
+    return feature_size

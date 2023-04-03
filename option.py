@@ -1,7 +1,7 @@
 import argparse
 
 parser = argparse.ArgumentParser(description='RTFM')
-parser.add_argument('--feature_type', default='c3d', help='the model used for feature extraction, i3d, c3d, or ViT')
+parser.add_argument('--feature_type', default='i3d', help='the model used for feature extraction, i3d, c3d, or ViT')
 parser.add_argument('--modality', default='RGB', help='the type of the input, RGB,AUDIO, or MIX')
 parser.add_argument('--gpus', default=0, type=int, choices=[0], help='gpus')
 parser.add_argument('--lr', type=str, default='[0.001]*3000', help='learning rates for steps(list form)')

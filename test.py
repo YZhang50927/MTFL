@@ -38,9 +38,9 @@ def test(dataloader, model, test_dataset, viz, device):
         rec_auc = auc(fpr, tpr)
         print('\n' + str(test_dataset) + ' auc : ' + str(rec_auc) + '\n')
 
-        precision, recall, th = precision_recall_curve(list(gt), pred)
-        pr_auc = auc(recall, precision)
-        viz.plot_lines(str(test_dataset)+' PR_AUC', y=pr_auc)
+        # precision, recall, th = precision_recall_curve(list(gt), pred)
+        # pr_auc = auc(recall, precision)
+        # viz.plot_lines(str(test_dataset)+' PR_AUC', y=pr_auc)
         viz.plot_lines(str(test_dataset)+' AUC', y=rec_auc)
         viz.lines(name=str(test_dataset) + ' scores', Y=pred)
         viz.lines(str(test_dataset)+' ROC', Y=tpr, X=fpr)

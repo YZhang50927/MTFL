@@ -18,7 +18,7 @@ if __name__ == '__main__':
     args = option.parser.parse_args()
     config = Config(args)
     os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
-    os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+    os.environ["CUDA_VISIBLE_DEVICES"] = args.gpu
 
     train_nloader = DataLoader(Dataset(args, test_mode=False, is_normal=True),
                                batch_size=args.batch_size, shuffle=True,
@@ -95,4 +95,5 @@ if __name__ == '__main__':
                     save_best_record(test_info, os.path.join(save_path, '{}-step-AUC.txt'.format(step)))
                     np.save(os.path.join(save_path, '{}-step-fpr.npy'.format(step)), fpr_VAD3)
                     np.save(os.path.join(save_path, '{}-step-tpr.npy'.format(step)), tpr_VAD3)
-    torch.save(model.state_dict(), args.save_models + args.model_name + 'final.pkl')
+    torch.save(model.state_dict(), os.path.join(args.save_models, args.feature_type,
+                                        args.model_name + '-' + args.feature_type + 'final.pkl'))

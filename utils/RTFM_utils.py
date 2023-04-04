@@ -96,7 +96,6 @@ def modelsize(model, input, type_size=4):
 
 def save_best_record(test_info, file_path):
     fo = open(file_path, "w")
-    fo.write("epoch: {}\n".format(test_info["epoch"][-1]))
-    fo.write("UCF auc: {}\n".format(str(test_info["UCF_AUC"][-1])))
-    fo.write("VAD3 auc: {}\n".format(str(test_info["VAD3_AUC"][-1])))
+    for key in test_info:
+        fo.write("{}: {}\n".format(key, test_info[key][-1]))
     fo.close()

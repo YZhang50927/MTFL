@@ -42,6 +42,6 @@ def test(dataloader, model, test_dataset, viz, device):
         # pr_auc = auc(recall, precision)
         # viz.plot_lines(str(test_dataset)+' PR_AUC', y=pr_auc)
         viz.plot_lines(str(test_dataset)+' AUC', y=rec_auc)
-        viz.lines(name=str(test_dataset) + ' scores', Y=pred)
+        # viz.lines(name=str(test_dataset) + ' scores', Y=pred)
         viz.lines(str(test_dataset)+' ROC', Y=tpr, X=fpr)
         return fpr, tpr, rec_auc

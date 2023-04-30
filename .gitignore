@@ -1,0 +1,6 @@
+/slowfast/
+/pytorchvideo/
+/Feature-Extractor-SlowFast/images
+/Feature-Extractor-SlowFast/*.md
+/Feature-Extractor-SlowFast/archios
+/Feature-Extractor-SlowFast/extractor_executions.log

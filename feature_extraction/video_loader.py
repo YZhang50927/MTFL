@@ -12,6 +12,7 @@ class VideoIter(data.Dataset):
     def __init__(self,
                  clip_length,
                  frame_stride,
+                 proc_video=None,
                  dataset_path=None,
                  video_transform=None,
                  return_label=False,):
@@ -23,7 +24,7 @@ class VideoIter(data.Dataset):
 
         # IO
         self.dataset_path = dataset_path
-        self.video_list = self._get_video_list(dataset_path=self.dataset_path)
+        self.video_list = self._get_video_list(dataset_path=self.dataset_path, proc_video=proc_video)
         self.return_label = return_label
 
         # data loading
@@ -70,16 +71,17 @@ class VideoIter(data.Dataset):
 
         return batch
 
-    def _get_video_list(self, dataset_path):
+    def _get_video_list(self, dataset_path, proc_video):
         assert os.path.exists(dataset_path), "VideoIter:: failed to locate: `{}'".format(dataset_path)
         vid_list = []
         for path, subdirs, files in os.walk(dataset_path):
             for name in files:
-                if 'mp4' not in name:
+                if 'mp4' not in name or name.split(".")[0] in proc_video:
                     continue
                 vid_list.append(os.path.join(path, name))
 
-        logging.info(f"Found {len(vid_list)} video files in {dataset_path}")
+        logging.info(f"Found {len(vid_list)} unprocessed video files in {dataset_path}")
+
         return vid_list
 
 

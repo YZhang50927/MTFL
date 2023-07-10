@@ -41,8 +41,9 @@ if __name__ == '__main__':
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     model = model.to(device)
 
-    if not os.path.exists(args.save_models):
-        os.makedirs(args.save_models)
+    model_path = os.path.join(args.save_models, args.feature_type)
+    if not os.path.exists(model_path):
+        os.makedirs(model_path)
 
     optimizer = optim.Adam(model.parameters(),
                            lr=config.lr[0], weight_decay=0.005)
@@ -81,7 +82,7 @@ if __name__ == '__main__':
 
             if test_info["UCF_AUC"][-1] > best_UCF_AUC or test_info["VAD3_AUC"][-1] > best_VAD3_AUC:
                 torch.save(model.state_dict(),
-                           os.path.join(args.save_models, args.feature_type,
+                           os.path.join(model_path,
                                         args.model_name + '-' + args.feature_type + '-{}.pkl'.format(step)))
                 if test_info["UCF_AUC"][-1] > best_UCF_AUC:
                     best_UCF_AUC = test_info["UCF_AUC"][-1]
@@ -99,5 +100,4 @@ if __name__ == '__main__':
                     save_best_record(test_info, os.path.join(save_path, '{}-step-AUC.txt'.format(step)))
                     np.save(os.path.join(save_path, '{}-step-fpr.npy'.format(step)), fpr_VAD3)
                     np.save(os.path.join(save_path, '{}-step-tpr.npy'.format(step)), tpr_VAD3)
-    torch.save(model.state_dict(), os.path.join(args.save_models, args.feature_type,
-                                        args.model_name + '-' + args.feature_type + 'final.pkl'))
+    torch.save(model.state_dict(), os.path.join(model_path, args.model_name + '-' + args.feature_type + 'final.pkl'))

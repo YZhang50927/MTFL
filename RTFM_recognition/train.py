@@ -8,7 +8,7 @@ from torch.nn import MSELoss
 
 
 def sparsity(arr, batch_size, lamda2):
-    loss = torch.mean(torch.norm(arr, dim=0))
+    loss = torch.mean(torch.norm(arr, dim=0)) #应该是一个样本中的类别有稀疏性吧
     return lamda2*loss
 
 
@@ -54,19 +54,14 @@ class RTFM_loss(torch.nn.Module):
         self.margin = margin
         self.sigmoid = torch.nn.Sigmoid()
         self.mae_criterion = SigmoidMAELoss()
-        self.criterion = torch.nn.BCELoss()
+        self.criterion = torch.nn.CrossEntropyLoss()
 
-    def forward(self, score_normal, score_abnormal, nlabel, alabel, feat_n, feat_a):
+    def forward(self, scores, nlabel, alabel, feat_n, feat_a):
         label = torch.cat((nlabel, alabel), 0)
-        score_abnormal = score_abnormal
-        score_normal = score_normal
-
-        score = torch.cat((score_normal, score_abnormal), 0)
-        score = score.squeeze()
 
         label = label.cuda()
 
-        loss_cls = self.criterion(score, label)  # BCE loss in the score space
+        loss_cls = self.criterion(scores, label)  # BCE loss in the score space
 
         loss_abn = torch.abs(self.margin - torch.norm(torch.mean(feat_a, dim=1), p=2, dim=1))
 
@@ -87,25 +82,22 @@ def train(nloader, aloader, model, batch_size, optimizer, viz, device):
         ainput, alabel = next(aloader)
 
         input = torch.cat((ninput, ainput), 0).to(device)
-        score_abnormal, score_normal, feat_select_abn, feat_select_normal, feat_abn_bottom, \
+        feat_select_abn, feat_select_normal, feat_abn_bottom, \
         feat_normal_bottom, scores, scores_nor_bottom, scores_nor_abn_bag, _ = model(input)  # b*32  x 2048
 
-        scores = scores.view(batch_size * 32 * 2, -1)
+        scores = scores.view(batch_size * 2, -1)
 
         scores = scores.squeeze()
-        abn_scores = scores[batch_size * 32:]
 
         nlabel = nlabel[0:batch_size]
         alabel = alabel[0:batch_size]
 
         loss_criterion = RTFM_loss(0.0001, 100)
-        loss_sparse = sparsity(abn_scores, batch_size, 8e-3)
-        loss_smooth = smooth(abn_scores, 8e-4)
-        cost = loss_criterion(score_normal, score_abnormal, nlabel, alabel, feat_select_normal, feat_select_abn) + loss_smooth + loss_sparse
+        #loss_sparse = sparsity(abn_scores, batch_size, 8e-3)
+        #loss_smooth = smooth(abn_scores, 8e-4)
+        cost = loss_criterion(scores, nlabel, alabel, feat_select_normal, feat_select_abn)
 
         viz.plot_lines('loss', cost.item())
-        viz.plot_lines('smooth loss', loss_smooth.item())
-        viz.plot_lines('sparsity loss', loss_sparse.item())
         optimizer.zero_grad()
         cost.backward()
         optimizer.step()

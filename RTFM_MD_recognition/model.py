@@ -182,7 +182,7 @@ class Model(nn.Module):
         self.Aggregate = Aggregate(len_feature=n_features)
         self.fc1 = nn.Linear(n_features, 512)
         self.fc2 = nn.Linear(512, 128)
-        self.fc3 = nn.Linear(128, 1)
+        self.fc3 = nn.Linear(128, 18) #class amount
 
         self.drop_out = nn.Dropout(0.7)
         self.relu = nn.LeakyReLU(negative_slope=5e-2)
@@ -208,8 +208,7 @@ class Model(nn.Module):
         scores = self.relu(self.fc2(scores))
         scores = self.drop_out(scores)
         scores = self.sigmoid(self.fc3(scores))
-        scores = scores.view(bs, ncrops, -1).mean(1)
-        scores = scores.unsqueeze(dim=2)
+        scores = scores.view(bs, t, -1) # B T 18
         # B * t * f
         normal_features = features[0:self.batch_size]
         normal_scores = scores[0:self.batch_size]

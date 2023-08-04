@@ -1,0 +1,20 @@
+import argparse
+
+parser = argparse.ArgumentParser(description='RTFM_MD_recognition')
+parser.add_argument('--feature_size', default='1024', help='vst feature size')
+parser.add_argument('--split', default='1', type=str, help='which split used for training and testing')
+parser.add_argument('--gpu', default="0", type=str, choices=["0", "1"], help='gpu')
+parser.add_argument('--lr', type=str, default='[0.001]*6000', help='learning rates for steps(list form)')
+parser.add_argument('--batch-size', type=int, default=32, help='number of instances in a batch of data (default: 16)')
+parser.add_argument('--workers', default=8, type=int, help='number of workers in dataloader')
+parser.add_argument('--env', default='rtfm_MD_recognition', help='viz env')
+parser.add_argument('--model-name', default='RTFM_MD_recognition', help='name to save model')
+parser.add_argument('--pretrained-ckpt', default=None, help='ckpt for pretrained model')
+parser.add_argument('--plot-freq', type=int, default=10, help='frequency of plotting (default: 10)')
+parser.add_argument('--max-epoch', type=int, default=6000, help='maximum iteration to train (default: 100)')
+parser.add_argument('--save_models', default='/media/DataDrive/yiling/models/recognition', help='saving path')
+parser.add_argument('--output_path', default='/media/DataDrive/yiling/results/recognition', help='result path')
+parser.add_argument('--load_model', default='/media/DataDrive/yiling/Test/models/rtfm-vst-665.pkl--', help='model path')
+parser.add_argument('--test_path', default='/media/DataDrive/yiling/Test/results', help='Test results of final model')
+
+

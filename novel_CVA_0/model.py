@@ -5,16 +5,16 @@ import torch.nn.init as torch_init
 torch.set_default_tensor_type('torch.FloatTensor')
 
 def weight_init(m):
-    # classname = m.__class__.__name__
-    # if classname.find('Conv') != -1 or classname.find('Linear') != -1:
-    #     #nn.init.kaiming_uniform_(m.weight, nonlinearity='leaky_relu')
-    #     torch_init.xavier_uniform_(m.weight)
-    #     if m.bias is not None:
-    #         m.bias.data.fill_(0)
-    if isinstance(m, nn.Conv1d) or isinstance(m, nn.Linear):
-        nn.init.xavier_uniform_(m.weight)
+    classname = m.__class__.__name__
+    if classname.find('Conv') != -1 or classname.find('Linear') != -1:
+        #nn.init.kaiming_uniform_(m.weight, nonlinearity='leaky_relu')
+        torch_init.xavier_uniform_(m.weight)
         if m.bias is not None:
             m.bias.data.fill_(0)
+    # if isinstance(m, nn.Conv1d) or isinstance(m, nn.Linear):
+    #     nn.init.xavier_uniform_(m.weight)
+    #     if m.bias is not None:
+    #         m.bias.data.fill_(0)
 
 
 class CVA(nn.Module):
@@ -225,13 +225,13 @@ class Encoder(nn.Module):
         feature3: [B T3 C]
         """
 
-        att1 = self.CVA1(feature1, feature2)  # T B C
-        att2 = self.CVA2(feature2, feature3)
-        att3 = self.CVA3(feature3, feature1)
+        # att1 = self.CVA1(feature1, feature2)  # T B C
+        # att2 = self.CVA2(feature2, feature3)
+        # att3 = self.CVA3(feature3, feature1)
 
-        # att1 = self.CVA1(feature2, feature1)  # T B C
-        # att2 = self.CVA2(feature3, feature2)
-        # att3 = self.CVA3(feature1, feature3)
+        att1 = self.CVA1(feature2, feature1)  # T B C
+        att2 = self.CVA2(feature3, feature2)
+        att3 = self.CVA3(feature1, feature3)
 
         out1 = self.aggregate(att1, att2, att3) # B T C
 

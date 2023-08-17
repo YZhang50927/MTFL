@@ -12,11 +12,11 @@ from utils.RTFM_utils import Visualizer
 from utils.utils import get_feature_size
 from config import *
 
-viz = Visualizer(env='VST_BASELINE', use_incoming_socket=False)
 
 if __name__ == '__main__':
     args = option.parser.parse_args()
     config = Config(args)
+    viz = Visualizer(env=args.env, use_incoming_socket=False)
     os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
     os.environ["CUDA_VISIBLE_DEVICES"] = args.gpu
 

@@ -184,7 +184,9 @@ def get_features_loader(dataset_path, clip_length, frame_interval, batch_size, n
         proc_v = []
         for root, dirs, files in os.walk(save_dir):
             for file in files:
-                proc_v.append(file)
+                file_path = os.path.join(root, file)
+                relative_path = os.path.relpath(file_path, save_dir)
+                proc_v.append(relative_path)
         proc_v = [v.split(".")[0] for v in proc_v]
         if len(proc_v) > 0:
             logging.info(

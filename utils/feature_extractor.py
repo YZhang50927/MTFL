@@ -232,8 +232,8 @@ def main():
     device = get_torch_device()
     register_logger(log_file=args.log_file)
 
-    # if args.seed is not None:
-    #     set_random_seed(args.seed)
+    if args.seed is not None:
+        set_random_seed(args.seed)
 
     cudnn.benchmark = True
 

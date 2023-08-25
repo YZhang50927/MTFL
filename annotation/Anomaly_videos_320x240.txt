@@ -1,0 +1,6 @@
+Anomaly_videos_320x240/Dangerous_Throwing_0.mp4 Abnormal 150 59 100
+Anomaly_videos_320x240/Dangerous_Throwing_1.mp4 Abnormal 283 108 153
+Anomaly_videos_320x240/Donut_Turn.mp4 Abnormal 833 163 791
+Anomaly_videos_320x240/Fighting.mp4 Abnormal 629 98 339
+Anomaly_videos_320x240/Littering.mp4 Abnormal 240 91 137
+Anomaly_videos_320x240/Zig_Zag.mp4 Abnormal 406 9 307

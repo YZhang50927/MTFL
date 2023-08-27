@@ -44,19 +44,15 @@ class RTFM_loss(torch.nn.Module):
         self.margin = margin
         self.sigmoid = torch.nn.Sigmoid()
         self.mae_criterion = SigmoidMAELoss()
-        self.criterion = torch.nn.BCELoss()
+        self.criterion = torch.nn.CrossEntropyLoss() # multi class
 
     def forward(self, score_normal, score_abnormal, nlabel, alabel, feat_n, feat_a):
-        label = torch.cat((nlabel, alabel), 0)
-        score_abnormal = score_abnormal
-        score_normal = score_normal
+        labels = torch.cat((nlabel, alabel), 0)
+        scores = torch.cat((score_normal, score_abnormal), 0)
 
-        score = torch.cat((score_normal, score_abnormal), 0)
-        score = score.squeeze()
+        labels = labels.cuda()
 
-        label = label.cuda()
-
-        loss_cls = self.criterion(score, label)  # BCE loss in the score space
+        loss_cls = self.criterion(scores, labels)  # CE loss in the score space
 
         loss_abn = torch.abs(self.margin - torch.norm(torch.mean(feat_a, dim=1), p=2, dim=1))
 
@@ -81,10 +77,9 @@ def train(nloader, aloader, model, batch_size, seg_num, optimizer, device):
         input3 = torch.cat((ninput3, ainput3), 0).to(device)
         score_abnormal, score_normal, feat_select_abn, feat_select_normal, scores = model(input1, input2, input3)
 
-        scores = scores.view(batch_size * seg_num * 2, -1) # BX32X2, 1
+        scores = scores.view(batch_size * seg_num * 2, -1)  # BX32X2, 18
 
-        scores = scores.squeeze()
-        abn_scores = scores[batch_size * seg_num:]
+        abn_scores, indice = torch.max(scores[batch_size*32:], dim=1)
 
         nlabel = nlabel[0:batch_size]
         alabel = alabel[0:batch_size]
@@ -123,14 +118,13 @@ def main():
     feature_size = args.feature_size
     model = Model(feature_size, args.batch_size, args.seg_num)
     optimizer = optim.Adam(model.parameters(), lr=args.lr, weight_decay=0.005)
-    test_info = {"epoch": [], "AUC": []}
-    best_AUC = -1
+    test_info = {"epoch": [], "TOP-1 ACC": []}
+    best_ACC = -1
     output_dir = args.output_dir
-    _, overall_auc = test(dataloader=test_loader,
-                          model=model,
-                          device=device,
-                          gen_scores=False,
-                          save_dir=None)
+    _, acc = test(dataloader=test_loader,
+                  model=model,
+                  device=device,
+                  class_criteria=args.cls_info)
 
     for step in tqdm(range(1, args.max_epoch + 1), total=args.max_epoch, dynamic_ncols=True):
         if (step - 1) % len(train_nloader) == 0:
@@ -148,17 +142,16 @@ def main():
               device=device)
 
         if step % 5 == 0 and step > 200:
-            _, overall_auc = test(dataloader=test_loader,
-                                  model=model,
-                                  device=device,
-                                  gen_scores=False,
-                                  save_dir=None)
+            _, acc = test(dataloader=test_loader,
+                          model=model,
+                          device=device,
+                          class_criteria=args.cls_info)
 
             test_info["epoch"].append(step)
-            test_info["AUC"].append(overall_auc)
+            test_info["TOP-1 ACC"].append(acc)
 
-            if test_info["AUC"][-1] > best_AUC:
-                best_AUC = test_info["AUC"][-1]
+            if test_info["TOP-1 ACC"][-1] > best_ACC:
+                best_ACC = test_info["TOP-1 ACC"][-1]
                 torch.save(model.state_dict(), os.path.join(args.save_models, args.model_name + '-{}.pkl'.format(step)))
                 file_path = os.path.join(output_dir, '{}-step-AUC.txt'.format(step))
                 with open(file_path, "w") as fo:

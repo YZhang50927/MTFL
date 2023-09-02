@@ -1,26 +1,48 @@
+"""
+Annotation Parser Script
+
+This script is used for annotating video files with anomaly information, such as the number of frames containing anomalies
+and the start-end frame couples where anomalies occur. It provides a graphical interface for replaying videos, pausing,
+marking frames with anomalies, and undoing markings.
+
+Usage:
+    python video_annotator.py --root_dir <root_directory> --video_subdir <video_subdirectory> --annotation_file <output_annotation_file> --anomaly_type <anomaly_class_name>
+
+Parameters:
+    --root_dir: Path to the root directory containing the video files.
+    --video_subdir: Subdirectory within the root directory where video files are located.
+    --annotation_file: Path to the output annotation file where annotated information will be saved.
+    --anomaly_type: The class name or type of anomalies to be annotated.
+
+Note:
+    Please run this in your local environment and then transfer the annotation file to the server for
+    further tasks. The server environment may have plugin issues due to the opencv-python.
+"""
 import cv2
 import sys
 import os
-import random
-# Directory containing raw videos
-raw = "H:\\Projects\\VAD\\Datasets\\baseline\\AnnotationVideo"
-# annotation_file = f"H:\\Projects\\VAD\\workspace\\data_preparation\\annotation\\doc\\Test_annotation.txt"
-annotation_file = f"H:\\Projects\\VAD\\Test\\Anomaly_videos.txt"
-initial_index = 0
+import argparse
 
-# anomaly_type = "RoadAccidents_VRUvsVRU"
-anomaly_type = "Abnormal"
-participant = "MotorbikeVsPedestrian"
-picknum = 3
 
-def get_files():
-    # 指定要遍历的文件夹路径
-    folder_path = f"H:\\Projects\\VAD\\Test\\Anomaly_videos"
+def get_args():
+    parser = argparse.ArgumentParser(description="Annotation Parser")
+    # io
+    parser.add_argument('--root_dir', type=str, default="H:\\Projects\\VAD\\Test",
+                        help="path to videos")
+    parser.add_argument('--video_subdir', type=str, default="Anomaly_videos",
+                        help="path to videos")
+    parser.add_argument('--annotation_file', type=str, default="H:\\Projects\\VAD\\Test\\Anomaly_videos.txt",
+                        help="define the length of each input sample.")
+    parser.add_argument('--anomaly_type', type=str, default='Abnormal', help="The class name of videos.")
 
-    # 存储视频文件的列表
+    return parser.parse_args()
+
+
+def get_files(folder_path):
+    # Store a list of video files
     video_files = []
 
-    # 遍历文件夹
+    # Traverse the folder
     for root, dirs, files in os.walk(folder_path):
         for file in files:
             if file.lower().endswith(('.mp4', '.avi', '.mkv', '.mov', '.wmv', '.flv')):
@@ -28,23 +50,17 @@ def get_files():
 
     return video_files
 
+
 if __name__ == "__main__":
-    # pathDir = os.listdir(f"{raw}\\{anomaly_type}\\{participant}")
-    # file = random.sample(pathDir, picknum)
+    args = get_args()
     # Loop over all files in directory
-    file = get_files()
-    for filename in file:
+    video_dir = os.path.join(args.root_dir, args.video_subdir)
+    files = get_files(video_dir)
+
+    for filename in files:
         if not filename.endswith(".mp4"):
             continue
 
-        # # Get index of video file
-        # index = int(filename.split('.')[0][-3:])
-        #
-        # # Only start at initial_index
-        # if index < initial_index:
-        #     continue
-
-        # cap = cv2.VideoCapture(raw + f"\\{anomaly_type}\\{participant}\\{filename}")
         cap = cv2.VideoCapture(filename)
         num_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
         print(f"{filename}: {num_frames}")
@@ -120,16 +136,17 @@ if __name__ == "__main__":
             elif key & 0xFF == ord('q'):  # q to quit
                 sys.exit(1)
 
+        # the annotation format:
+        # relative path to video dir    anomaly type      num_frames     start-end-couples
         num_action = len(actions)
-        # line = f"{participant}{anomaly_type}/{filename} {num_frames} {participant}{anomaly_type}"
-        # line = f"{filename} {anomaly_type}"
-        basename = os.path.basename(filename)
-        line = f"{basename} {anomaly_type} {num_frames}"
+        dir_and_file = os.path.split(filename)
+        relative_path = os.path.relpath(filename, args.root_dir)
+        line = f"{relative_path} {args.anomaly_type} {num_frames}"
         for i in range(num_action):
             line += f" {actions[i][0]} {actions[i][1]}"
         line += '\n'
 
-        with open(annotation_file, "a") as f:
+        with open(args.annotation_file, "a") as f:
             f.write(line)
 
         cap.release()

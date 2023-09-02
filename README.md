@@ -27,6 +27,12 @@ demo/
 │   └── rec_results  # recognition labels   
 └── README.md 
 ```
+## Environment
+* Environment name
+```
+conda activate NoError
+```
+* work folder: /home/yiling/workspace/demo/
 ## Video Preprocessing
 
 If you need to perform video annotation or standardize video formats, 
@@ -112,7 +118,7 @@ is 18.
 
 The paths of two feature extractors are listed in the below table, and the default extractor is the VST model pretrained on VAD. 
 
-| Model                         | Path |
+| Feature Extractor             | Path |
 |-------------------------------|------|
 | VST pretrained on VAD         |/media/DataDrive/yiling/models/VST_finetune/hflip_speed_120_2d/best_top1_acc_epoch_15.pth  |
 | VST pretrained on Kinetics400 |/media/DataDrive/yiling/models/pretrained_feature_extraction_models/swin_base_patch244_window877_kinetics400_22k.pth|
@@ -129,7 +135,7 @@ There are two checkpoints. Make sure that the features for inference corresponds
 The paths for the MTFL detection checkpoints corresponding to the two feature extractors are 
 as shown in the table below.
 
-| Checkpoint                                                                               | UCF AUC(%) | VAD AUC(%) | Path                                                                                                             |
+| Detection Checkpoint                                                                     | UCF AUC(%) | VAD AUC(%) | Path                                                                                                             |
 |------------------------------------------------------------------------------------------|------------|------------|------------------------------------------------------------------------------------------------------------------|
 | MTFL detection model trained using features extracted with VST pretrained on VAD         | 89.78      | 88.42      |/media/DataDrive/yiling/Test/models/MTFL/MTFL-vst-VAD.pkl                                                        |
 | MTFL detection model trained using features extracted with VST pretrained on Kinetics400 | 87.61      | 87.06      | /media/DataDrive/yiling/Test/models/MTFL/MTFL-vst-kinetics400.pkl|
@@ -179,7 +185,7 @@ Because the evaluation results for recognition are obtained through 4-fold cross
 , there are seven recognition checkpoints by saving the checkpoints that performed the best on 
 UCF and VAD separately during training on different splits, as shown in the table below. You can choose one from them.
 
-| Checkpoint                                                                                       | UCF Acc(%) | VAD Acc(%) | Path                                                                    |
+| Recognition Checkpoint                                                                           | UCF Acc(%) | VAD Acc(%) | Path                                                                    |
 |--------------------------------------------------------------------------------------------------|------------|------------|-------------------------------------------------------------------------|
 | MTFL recognition model trained on VAD split1 with the best performance on UCF-Crime              | 39.88      | -          | /media/DataDrive/yiling/Test/models/MTFL_recog/split_1_best_UCF.pkl     |
 | MTFL recognition model trained on VAD split1 with the best performance on VAD                    | -          | 45.87      | /media/DataDrive/yiling/Test/models/MTFL_recog/split_1_best_VAD.pkl     |
@@ -191,7 +197,7 @@ UCF and VAD separately during training on different splits, as shown in the tabl
 
 All recognition models use the VST pretrained on VAD for feature extraction. 
 The training of recognition models requires separate training on 4 splits and generates multiple checkpoints. 
-Therefore, there is no provided model corresponding to VST pretrained on Kinetics400, 
+Therefore, there is no provided recognition model corresponding to VST pretrained on Kinetics400, 
 taking into account both the necessity and workload. If needed, you can use the recognition/train.py 
 script for training.
 

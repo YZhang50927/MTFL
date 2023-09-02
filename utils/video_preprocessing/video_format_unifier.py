@@ -35,9 +35,9 @@ target_fps = 30.0
 def get_args():
     parser = argparse.ArgumentParser(description="Unify FPS and Resolution Parser")
     # io
-    parser.add_argument('--video_dir', type=str, default="H:\\Projects\\VAD\\Test\\Anonymized_010",
+    parser.add_argument('--video_dir', type=str, default="/home/yiling/workspace/demo/test_videos/Anonymized_010",
                         help="path to videos")
-    parser.add_argument('--out_dir', type=str, default="H:\\Projects\\VAD\\Test\\Anonymized_010_test",
+    parser.add_argument('--out_dir', type=str, default="/home/yiling/workspace/demo/test_videos/Anonymized_010_320x240",
                         help="path to videos")
 
     return parser.parse_args()
@@ -60,25 +60,27 @@ if __name__ == "__main__":
 
         print(f"Processing video {counter}")
 
-        cap = cv2.VideoCapture(f"{args.video_dir}\\{file}")
+        input_path = os.path.join(args.video_dir, file)
+        output_path = os.path.join(args.out_dir, file)
+        cap = cv2.VideoCapture(input_path)
         fps = cap.get(cv2.CAP_PROP_FPS)
         width = cap.get(cv2.CAP_PROP_FRAME_WIDTH)
         height = cap.get(cv2.CAP_PROP_FRAME_HEIGHT)
 
         # Check if the video matches the target specifications
         if fps==target_fps and width==target_res[0] and height==target_res[1]:
-            print(f"Skip {args.video_dir}\\{file}")
-            shutil.copyfile(f"{args.video_dir}\\{file}", f"{args.out_dir}\\{file}")
+            print(f"Skip {input_path}")
+            shutil.copyfile(input_path, output_path)
             cap.release()
             continue
 
-        video_to_resize.append(f"{args.video_dir}\\{file}")
+        video_to_resize.append(input_path)
         fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-        out = cv2.VideoWriter(f"{args.out_dir}\\{file}", fourcc, target_fps, target_res)
+        out = cv2.VideoWriter(output_path, fourcc, target_fps, target_res)
 
         if not cap.isOpened():
-            print(f"Error opening video: {args.video_dir}\\{file}")
-            video_fail.append(f"{args.video_dir}\\{file}")
+            print(f"Error opening video: {input_path}")
+            video_fail.append(f"{input_path}")
             sys.exit(1)
 
         while cap.isOpened():

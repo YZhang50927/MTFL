@@ -30,18 +30,17 @@ demo/
 ## Video Preprocessing
 
 If you need to perform video annotation or standardize video formats, 
-please run 'utils/video_preprocessing/video_annotator.py' or 'utils/video_preprocessing/video_format_unifier.py'
-in your local environment. 
-After processing, you can then upload the modified videos or the generated annotation files
-to the server for subsequent tasks. 
-Please note that running them on the server may encounter issues 
-related to 'qt.qpa.plugin'. 
-Make sure you have OpenCV installed to run these scripts.
+run 'utils/video_preprocessing/video_annotator.py' or 'utils/video_preprocessing/video_format_unifier.py'.
+
+### Annotation
+Please note that running 'video_annotator.py' on the server may encounter issues related 
+to 'qt.qpa.plugin', while running it locally on Windows would not have any issues. 
+Therefore, you can run it in your local environment and then upload the generated annotation files to the server for subsequent tasks.
+Make sure you have OpenCV installed in your local environment to run it.
 ```
 pip install opencv-python
 ```
 
-### Annotation
 To run video_annotator.py, you need to specify the following parameters in the code according to your needs:
 ```
 --root_dir: Denotes the root directory where video files are stored. 

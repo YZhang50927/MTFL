@@ -80,19 +80,39 @@ class Dataset(data.Dataset):
             m_features = read_features(mf_path)
             s_features = read_features(sf_path)
             label = torch.tensor(label)
-            return l_features, m_features, s_features, label, file
+            return s_features, m_features, l_features, label, file
         else:
             lf_path, mf_path, sf_path, label = self.list[index]
             l_features = read_features(lf_path)
             m_features = read_features(mf_path)
             s_features = read_features(sf_path)
             label = torch.tensor(label)
-            return l_features, m_features, s_features, label
+            return s_features, m_features, l_features, label
 
     def __len__(self):
         return len(self.list)
 
     def _get_features_list(self, lf_dir, mf_dir, sf_dir, annotation_path):
+        """
+        Construct a feature list from the given directories and annotation file.
+
+        Args:
+            lf_dir (str): Directory path containing long-frame-length feature files.
+            mf_dir (str): Directory path containing medium-frame-length feature files.
+            sf_dir (str): Directory path containing short-frame-length feature files.
+            annotation_path (str): Path to a text file containing annotation information.
+
+        Returns:
+            list: A list of tuples, each containing (lf_path, mf_path, sf_path, cls) or (lf_path, mf_path, sf_path, cls, file).
+
+        Raises:
+            AssertionError: If the input directories do not exist.
+
+        Note:
+            - If test_mode is True, each tuple contains (lf_path, mf_path, sf_path, cls, file), where file is the file name.
+            - If test_mode is False, each tuple contains (lf_path, mf_path, sf_path, cls), and selection is based on whether it is normal (is_normal).
+
+        """
         assert os.path.exists(lf_dir)
         assert os.path.exists(mf_dir)
         assert os.path.exists(sf_dir)
@@ -106,7 +126,11 @@ class Dataset(data.Dataset):
                 lf_path = os.path.join(lf_dir, file + '.txt')
                 mf_path = os.path.join(mf_dir, file + '.txt')
                 sf_path = os.path.join(sf_dir, file + '.txt')
-                cls = int(items[1])
+                unsupported_class = 18
+                if not items[1].isdigit():
+                    cls = class_to_int.get(items[1], unsupported_class)
+                else:
+                    cls = int(items[1])
                 if self.test_mode:
                     features_list.append((lf_path, mf_path, sf_path, cls, file))
                 elif (cls == class_to_int['Normal']) == self.is_normal:

@@ -126,6 +126,7 @@ def main():
     test_info = {"epoch": [], "AUC": []}
     best_AUC = -1
     output_dir = args.output_dir
+    os.makedirs(output_dir, exist_ok=True)
     _, overall_auc = test(dataloader=test_loader,
                           model=model,
                           device=device,

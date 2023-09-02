@@ -121,10 +121,11 @@ def main():
     test_info = {"epoch": [], "TOP-1 ACC": []}
     best_ACC = -1
     output_dir = args.output_dir
-    _, acc = test(dataloader=test_loader,
+    os.makedirs(output_dir, exist_ok=True)
+    acc, _ = test(dataloader=test_loader,
                   model=model,
                   device=device,
-                  class_criteria=args.cls_info)
+                  test_dataset=args.test_dataset)
 
     for step in tqdm(range(1, args.max_epoch + 1), total=args.max_epoch, dynamic_ncols=True):
         if (step - 1) % len(train_nloader) == 0:
@@ -141,11 +142,11 @@ def main():
               optimizer=optimizer,
               device=device)
 
-        if step % 5 == 0 and step > 200:
-            _, acc = test(dataloader=test_loader,
+        if step % 5 == 0 and step > 5:
+            acc, _ = test(dataloader=test_loader,
                           model=model,
                           device=device,
-                          class_criteria=args.cls_info)
+                          test_dataset=args.test_dataset)
 
             test_info["epoch"].append(step)
             test_info["TOP-1 ACC"].append(acc)
@@ -153,7 +154,7 @@ def main():
             if test_info["TOP-1 ACC"][-1] > best_ACC:
                 best_ACC = test_info["TOP-1 ACC"][-1]
                 torch.save(model.state_dict(), os.path.join(args.save_models, args.model_name + '-{}.pkl'.format(step)))
-                file_path = os.path.join(output_dir, '{}-step-AUC.txt'.format(step))
+                file_path = os.path.join(output_dir, '{}-step-ACC.txt'.format(step))
                 with open(file_path, "w") as fo:
                     for key in test_info:
                         fo.write("{}: {}\n".format(key, test_info[key][-1]))

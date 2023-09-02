@@ -24,8 +24,7 @@ demo/
 ├── results/       
 │   ├── AUC          # detection AUC
 │   ├── scores       # detection scores
-│   └── rec_results  # recognition labels 
-├── env.txt          # environment  
+│   └── rec_results  # recognition labels   
 └── README.md 
 ```
 ## Video Preprocessing
@@ -103,10 +102,15 @@ the parameters you may want to experiment with are listed as below:
 python utils/feature_extractor.py --clip_length [8/32/64] --dataset_path [your data path] --save_dir [your feature path] 
 ```
 
-* You can change the used pretrained feature extractor by specify the model path.
+* You can change the used pretrained feature extractor by specifying the model path. 
 ```
 python utils/feature_extractor.py --clip_length [8/32/64] --pretrained_3d [model path]
 ```
+Note: if you use VST pretrained on Kinetics400, you need to change <num_classes> to 400 in line 21 of 
+'utils/swin_config/_base/models/swin/swin_tiny.py' to adapt the model size. For VST pretrained on VAD, the <num_classes>
+is 18.
+
+
 The paths of two feature extractors are listed in the below table, and the default extractor is the VST model pretrained on VAD. 
 
 | Model                         | Path |
@@ -169,7 +173,8 @@ To test a recognition checkpoint model on your test videos, run
 python recognition/test.py --test_anno [your_anno_file.txt] --recognition_model [checkpoint path]
 ```
 
-The prerequisites are same as Detection, and the changable parameters are in 'recognition/option.py'.
+The prerequisites are same as Detection, and the modifiable parameters are in 'recognition/option.py'. 
+The recognition results of all input will be saved as 'results/rec_results/output_pred.txt'. 
 
 Because the evaluation results for recognition are obtained through 4-fold cross-validation
 , there are seven recognition checkpoints by saving the checkpoints that performed the best on 
@@ -192,7 +197,7 @@ taking into account both the necessity and workload. If needed, you can use the 
 script for training.
 
 ### Train
-To train a detection model, run:
+To train a recognition model, run:
 ```
 python recognition/train.py --train_anno [your_train_anno_file.txt] --test_anno [your_test_anno_file.txt]
 --lf_dir [path to long frame length features] --mf_dir [path to medium frame length features] --sf_dir 

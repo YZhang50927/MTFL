@@ -7,7 +7,7 @@ test_parser.add_argument('--lf_dir', type=str, default='features/L64', help='lon
 test_parser.add_argument('--mf_dir', type=str, default='features/L32', help='media frame length feature path')
 test_parser.add_argument('--sf_dir', type=str, default='features/L8', help='short frame length feature path')
 test_parser.add_argument('--test_anno', default='annotation/Anomaly_videos.txt', help='test annotation file')
-test_parser.add_argument('--detection_model', default='/media/DataDrive/yiling/Test/models/MTFL/MTFL.pkl',
+test_parser.add_argument('--detection_model', default='/media/DataDrive/yiling/Test/models/MTFL/MTFL-vst-VAD.pkl',
                          help='model path')
 # output path
 test_parser.add_argument('--output_dir', default='results',

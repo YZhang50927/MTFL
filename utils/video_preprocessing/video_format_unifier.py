@@ -27,6 +27,10 @@ import sys
 import shutil
 import argparse
 
+# UCF format
+target_res = (320, 240)
+target_fps = 30.0
+
 
 def get_args():
     parser = argparse.ArgumentParser(description="Unify FPS and Resolution Parser")
@@ -40,9 +44,6 @@ def get_args():
 
 
 if __name__ == "__main__":
-    # UCF format
-    target_res = (320, 240)
-    target_fps = 30.0
 
     args = get_args()
     video_to_resize = []

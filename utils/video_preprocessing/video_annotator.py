@@ -28,11 +28,11 @@ def get_args():
     parser = argparse.ArgumentParser(description="Annotation Parser")
     # io
     parser.add_argument('--root_dir', type=str, default="H:\\Projects\\VAD\\Test",
-                        help="path to videos")
+                        help="path to root directory")
     parser.add_argument('--video_subdir', type=str, default="Anomaly_videos",
-                        help="path to videos")
+                        help="path to video subfolder")
     parser.add_argument('--annotation_file', type=str, default="H:\\Projects\\VAD\\Test\\Anomaly_videos.txt",
-                        help="define the length of each input sample.")
+                        help="the output annotation file")
     parser.add_argument('--anomaly_type', type=str, default='Abnormal', help="The class name of videos.")
 
     return parser.parse_args()

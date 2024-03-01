@@ -1,5 +1,35 @@
-# MTFL demo
+# MTFL: Multi-Timescale Feature Learning for Weakly-supervised Anomaly Detection in Surveillance Videos
 
+This repo is the official Pytorch implementation of our paper:
+
+> [**MTFL: Multi-Timescale Feature Learning for Weakly-supervised Anomaly Detection in Surveillance Videos**](PAPER LINK)
+>
+<!--Author list-->
+
+## Introduction
+![intro](figures/intro.png)
+
+Detection of anomaly events is relevant for public safety and requires a combination of fine-grained motion information and long-time action recognition. Therefore, we propose a Multi-Timescale Feature Learning (MTFL) method to enhance the representation of anomaly features. We employ short, medium, and long temporal tubelets to extract spatio-temporal video 
+features using the Video Swin Transformer. Experimental results demonstrate that 
+MTFL outperforms state-of-the-art methods on the UCF-Crime dataset, achieving an 
+anomaly detection performance 89.78% AUC. Moreover, it performs 95.32% AUC on the 
+ShanghaiTech and 84.57% AP on the XD-Violence dataset, complementary to several
+SotA results. Building upon MTFL, we also propose an anomaly recognition network 
+that employs partial features for classification, achieving a leading accuracy on 
+UCF-Crime, outperforming the existing recognition literature. Furthermore, 
+we introduce an extended dataset for UCF-Crime, 
+namely Video Anomaly Detection Dataset~(VADD), 
+involving 2,591 videos in 18 classes with extensive coverage of realistic anomalies. 
+
+## Models and Dataset
+* [VADD]()
+* [MTFL checkpoints for anomaly detection]()
+* [MTFL checkpoints for anomaly recognition]()
+
+## Environment setup
+```
+pip install -r requirements.txt
+```
 ## Folder Structure
 ```flow
 demo/  
@@ -27,26 +57,13 @@ demo/
 │   └── rec_results  # recognition labels   
 └── README.md 
 ```
-## Environment
-* Environment name
-```
-conda activate NoError
-```
-* work folder: /home/yiling/workspace/demo/
+
 ## Video Preprocessing
 
 If you need to perform video annotation or standardize video formats, 
 run 'utils/video_preprocessing/video_annotator.py' or 'utils/video_preprocessing/video_format_unifier.py'.
 
 ### Annotation
-Please note that running 'video_annotator.py' on the server may encounter issues related 
-to 'qt.qpa.plugin', while running it locally on Windows would not have any issues. 
-Therefore, you can run it in your local environment and then upload the generated annotation files to the server for subsequent tasks.
-Make sure you have OpenCV installed in your local environment to run it.
-```
-pip install opencv-python
-```
-
 To run video_annotator.py, you need to specify the following parameters in the code according to your needs:
 ```
 --root_dir: Denotes the root directory where video files are stored. 
@@ -116,29 +133,24 @@ Note: if you use VST pretrained on Kinetics400, you need to change <num_classes>
 is 18.
 
 
-The paths of two feature extractors are listed in the below table, and the default extractor is the VST model pretrained on VAD. 
-
-| Feature Extractor             | Path |
-|-------------------------------|------|
-| VST pretrained on VAD         |/media/DataDrive/yiling/models/VST_finetune/hflip_speed_120_2d/best_top1_acc_epoch_15.pth  |
-| VST pretrained on Kinetics400 |/media/DataDrive/yiling/models/pretrained_feature_extraction_models/swin_base_patch244_window877_kinetics400_22k.pth|
+Two feature extractors used in our model are provided as below:
+* [Video Swin Transformer pretrained on VAD](link)
+* [VST pretrained on Kinetics-400](link)
 
 
-## Detection
+## Anomaly Detection
 ### Inference
 To test a detection checkpoint model on your test videos, run:
 ```
 python detection/test.py --test_anno [your_anno_file.txt] --detection_model [checkpoint path]
 ```
 
-There are two checkpoints. Make sure that the features for inference corresponds to the checkpoint being evaluated. 
-The paths for the MTFL detection checkpoints corresponding to the two feature extractors are 
-as shown in the table below.
+All anomaly detection MTFL checkpoints are listed in the below table. Make sure that the features for inference corresponds to the checkpoint being evaluated.
 
-| Detection Checkpoint                                                                     | UCF AUC(%) | VAD AUC(%) | Path                                                                                                             |
-|------------------------------------------------------------------------------------------|------------|------------|------------------------------------------------------------------------------------------------------------------|
-| MTFL detection model trained using features extracted with VST pretrained on VAD         | 89.78      | 88.42      |/media/DataDrive/yiling/Test/models/MTFL/MTFL-vst-VAD.pkl                                                        |
-| MTFL detection model trained using features extracted with VST pretrained on Kinetics400 | 87.61      | 87.06      | /media/DataDrive/yiling/Test/models/MTFL/MTFL-vst-kinetics400.pkl|
+| Detection Checkpoint        | feature       | UCF   | ShanghaiTech | XD-Violence | VADD |
+|-----------------------------|---------------|-------|--------------|-------------|---|
+| [MTFL_AD_VST_Kinetics400]() | VST-RGB       | 87.61 | 95.32        | 84.57       | - |
+| [MTFL_AD_VST_VADD]()        | VST<sub>Aug</sub>_RGB | 89.79 | 95.70 | 79.40 | 88.42 |
 
 
 
@@ -171,7 +183,7 @@ python detection/train.py --train_anno [your_train_anno_file.txt] --test_anno [y
 
 Other training parameters can be found in 'detection/option.py'
 
-## Recognnition
+## Anomaly Recognnition
 ### Inference
 To test a recognition checkpoint model on your test videos, run
 ```
@@ -183,19 +195,19 @@ The recognition results of all input will be saved as 'results/rec_results/outpu
 
 Because the evaluation results for recognition are obtained through 4-fold cross-validation
 , there are seven recognition checkpoints by saving the checkpoints that performed the best on 
-UCF and VAD separately during training on different splits, as shown in the table below. You can choose one from them.
+UCF and VADD separately during training on different splits, as shown in the table below. You can choose one from them.
 
-| Recognition Checkpoint                                                                           | UCF Acc(%) | VAD Acc(%) | Path                                                                    |
-|--------------------------------------------------------------------------------------------------|------------|------------|-------------------------------------------------------------------------|
-| MTFL recognition model trained on VAD split1 with the best performance on UCF-Crime              | 39.88      | -          | /media/DataDrive/yiling/Test/models/MTFL_recog/split_1_best_UCF.pkl     |
-| MTFL recognition model trained on VAD split1 with the best performance on VAD                    | -          | 45.87      | /media/DataDrive/yiling/Test/models/MTFL_recog/split_1_best_VAD.pkl     |
-| MTFL recognition model trained on VAD split2 with the best performance on UCF-Crime              | 47.02      | -          | /media/DataDrive/yiling/Test/models/MTFL_recog/split_2_best_UCF.pkl     |
-| MTFL recognition model trained on VAD split2 with the best performance on VAD                    | -          | 49.31      | /media/DataDrive/yiling/Test/models/MTFL_recog/split_2_best_VAD.pkl     |
-| MTFL recognition model trained on VAD split3 with the best performance on UCF-Crime              | 49.40      | -          | /media/DataDrive/yiling/Test/models/MTFL_recog/split_3_best_UCF.pkl     |
-| MTFL recognition model trained on VAD split3 with the best performance on VAD                    | -          | 53.88      | /media/DataDrive/yiling/Test/models/MTFL_recog/split_3_best_VAD.pkl     |
-| MTFL recognition model trained on VAD split4 with the best performance on both VAD and UCF-Crime | 45.83      | 52.29      | /media/DataDrive/yiling/Test/models/MTFL_recog/split_4_best_UCF_VAD.pkl |
+| Recognition Checkpoint                                                                             | UCF Acc(%) | VAD Acc(%) |
+|----------------------------------------------------------------------------------------------------|------------|------------|
+| [MTFL recognition model trained on VADD split1 with the best performance on UCF-Crime]()           | 39.88      | -          |
+| [MTFL recognition model trained on VADD split1 with the best performance on VAD]()                 | -          | 45.87      |
+| [MTFL recognition model trained on VADD split2 with the best performance on UCF-Crime]()              | 47.02      | -          |
+| [MTFL recognition model trained on VADD split2 with the best performance on VAD]()                    | -          | 49.31      |
+| [MTFL recognition model trained on VADD split3 with the best performance on UCF-Crime]()              | 49.40      | -          |
+| [MTFL recognition model trained on VADD split3 with the best performance on VAD]()                    | -          | 53.88      |
+| [MTFL recognition model trained on VADD split4 with the best performance on both VAD and UCF-Crime]()  | 45.83      | 52.29      |
 
-All recognition models use the VST pretrained on VAD for feature extraction. 
+All recognition models use the VST pretrained on VADD for feature extraction. 
 The training of recognition models requires separate training on 4 splits and generates multiple checkpoints. 
 Therefore, there is no provided recognition model corresponding to VST pretrained on Kinetics400, 
 taking into account both the necessity and workload. If needed, you can use the recognition/train.py 
@@ -210,7 +222,10 @@ python recognition/train.py --train_anno [your_train_anno_file.txt] --test_anno 
 ```
 
 Note: there are four pairs of training annotation and testing annotation files corresponding to four splits for each dataset. 
-Make sure the correspondence between the training and testing files; otherwise, there are data leakage issues. 
-The annotation files of all splits in UCF-Crime and VAD are in '/media/DataDrive/yiling/annotation/recognition/splits'.
+Make sure the correspondence between the training and testing files; otherwise, there are data leakage issues.
 Other training parameters can be found in 'recognition/option.py'
+
+<!--## Citation
+
+If you find this repo useful for your research, please consider citing our paper:-->
 

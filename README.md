@@ -129,13 +129,17 @@ python utils/feature_extractor.py --clip_length [8/32/64] --dataset_path [your d
 python utils/feature_extractor.py --clip_length [8/32/64] --pretrained_3d [model path]
 ```
 Note: if you use VST pretrained on Kinetics400, you need to change <num_classes> to 400 in line 21 of 
-'utils/swin_config/_base/models/swin/swin_tiny.py' to adapt the model size. For VST pretrained on VAD, the <num_classes>
+'utils/swin_config/_base/models/swin/swin_tiny.py' to adapt the model size. For VST pretrained on VADD, the <num_classes>
 is 18.
 
 
 Two feature extractors used in our model are provided as below:
 * [Video Swin Transformer pretrained on VAD](link)
 * [VST pretrained on Kinetics-400](link)
+
+The extracted features of benchmark datasets are provided as below:
+* [VST_RBG features of UCF-Crime, XD-Violence, Shanghai Tech, and VADD]()
+* [VST<sub>Aug</sub>_RGB features of UCF-Crime, XD-Violence, Shanghai Tech, and VADD]()
 
 
 ## Anomaly Detection

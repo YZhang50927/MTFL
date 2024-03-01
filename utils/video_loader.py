@@ -105,7 +105,7 @@ class VideoIter(data.Dataset):
                 relative_path = os.path.join(parent_dir, name)
                 if use_splits and relative_path not in splits_files:
                     continue
-                if 'mp4' not in name or relative_path.split(".")[0] in proc_video:
+                if ('mp4' not in name and 'avi' not in name) or relative_path.split(".")[0] in proc_video:
                     continue
                 vid_list.append(os.path.join(path, name))
 

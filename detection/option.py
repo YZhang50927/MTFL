@@ -45,8 +45,9 @@ train_parser.add_argument('--feature_size', type=int, default=1024, help='featur
 train_parser.add_argument('--seg_num', type=int, default=32, help='the number of snippets')
 train_parser.add_argument('--lr', type=float, default='0.0001', help='learning rates for steps(list form)')
 train_parser.add_argument('--batch-size', type=int, default=64, help='batch size')
-train_parser.add_argument('--workers', default=8, help='number of workers in dataloader')
+train_parser.add_argument('--workers', type=int, default=8, help='number of workers in dataloader')
 train_parser.add_argument('--max-epoch', type=int, default=2000, help='maximum iteration to train (default: 100)')
+train_parser.add_argument('--metric', type=str, choices=["AP", "AUC"], default="AUC", help='the used metric')
 
 
 

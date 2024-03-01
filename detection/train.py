@@ -123,15 +123,15 @@ def main():
     feature_size = args.feature_size
     model = Model(feature_size, args.batch_size, args.seg_num)
     optimizer = optim.Adam(model.parameters(), lr=args.lr, weight_decay=0.005)
-    test_info = {"epoch": [], "AUC": []}
-    best_AUC = -1
+    test_info = {"epoch": [], "AUC": [], "AP": []}
+    best_result = -1
     output_dir = args.output_dir
     os.makedirs(output_dir, exist_ok=True)
-    _, overall_auc = test(dataloader=test_loader,
-                          model=model,
-                          device=device,
-                          gen_scores=False,
-                          save_dir=None)
+    _, overall_auc, ap = test(dataloader=test_loader,
+                              model=model,
+                              device=device,
+                              gen_scores=False,
+                              save_dir=None)
 
     for step in tqdm(range(1, args.max_epoch + 1), total=args.max_epoch, dynamic_ncols=True):
         if (step - 1) % len(train_nloader) == 0:
@@ -149,19 +149,29 @@ def main():
               device=device)
 
         if step % 5 == 0 and step > 200:
-            _, overall_auc = test(dataloader=test_loader,
-                                  model=model,
-                                  device=device,
-                                  gen_scores=False,
-                                  save_dir=None)
+            _, overall_auc, ap = test(dataloader=test_loader,
+                                      model=model,
+                                      device=device,
+                                      gen_scores=False,
+                                      save_dir=None)
 
             test_info["epoch"].append(step)
             test_info["AUC"].append(overall_auc)
+            test_info["AP"].append(ap)
 
-            if test_info["AUC"][-1] > best_AUC:
-                best_AUC = test_info["AUC"][-1]
+            # if test_info["AUC"][-1] > best_result:
+            #     best_result = test_info["AUC"][-1]
+            #     torch.save(model.state_dict(), os.path.join(args.save_models, args.model_name + '-{}.pkl'.format(step)))
+            #     file_path = os.path.join(output_dir, '{}-step-AUC.txt'.format(step))
+            #     with open(file_path, "w") as fo:
+            #         for key in test_info:
+            #             fo.write("{}: {}\n".format(key, test_info[key][-1]))
+
+            metric = args.metric
+            if test_info[metric][-1] > best_result:
+                best_result = test_info[metric][-1]
                 torch.save(model.state_dict(), os.path.join(args.save_models, args.model_name + '-{}.pkl'.format(step)))
-                file_path = os.path.join(output_dir, '{}-step-AUC.txt'.format(step))
+                file_path = os.path.join(output_dir, '{}-step-result.txt'.format(step))
                 with open(file_path, "w") as fo:
                     for key in test_info:
                         fo.write("{}: {}\n".format(key, test_info[key][-1]))

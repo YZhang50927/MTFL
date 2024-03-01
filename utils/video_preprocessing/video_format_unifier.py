@@ -31,6 +31,10 @@ import argparse
 target_res = (320, 240)
 target_fps = 30.0
 
+# XD format
+# target_res = (640, 336)
+# target_fps = 24.0
+
 
 def get_args():
     parser = argparse.ArgumentParser(description="Unify FPS and Resolution Parser")

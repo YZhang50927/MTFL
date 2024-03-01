@@ -99,7 +99,8 @@ class Dataset(data.Dataset):
             lines = f.read().splitlines(keepends=False)
             for line in lines:
                 items = line.split()
-                file = items[0].split(".")[0]
+                #file = items[0].split(".")[0] for XD
+                file, ext = os.path.splitext(items[0])
                 file = file.replace("/", os.sep)
                 lf_path = os.path.join(lf_dir, file + '.txt')
                 mf_path = os.path.join(mf_dir, file + '.txt')

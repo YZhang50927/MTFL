@@ -1,5 +1,5 @@
 import torch
-from sklearn.metrics import auc, roc_curve
+from sklearn.metrics import auc, roc_curve, average_precision_score
 from tqdm import tqdm
 import os
 import matplotlib.pyplot as plt
@@ -84,6 +84,7 @@ def test(dataloader, model, device, gen_scores=False, save_dir=None):
     Returns:
         single_video_AUC (dict): A dictionary containing AUC values for each video.
         overall_auc (float): Overall AUC value.
+        ap (float): average precision
     """
     single_video_AUC = {"video": [], "AUC": []}
 
@@ -122,11 +123,12 @@ def test(dataloader, model, device, gen_scores=False, save_dir=None):
 
         pred = pred.cpu().detach().numpy()
         gt = gt.cpu().detach().numpy()
+        ap = average_precision_score(gt, pred)
         fpr, tpr, threshold = roc_curve(gt, pred)
         overall_auc = auc(fpr, tpr)
-        print('\n' + 'Overall auc : ' + str(overall_auc) + '\n')
+        print('\n' + 'Overall auc : ' + str(overall_auc) + ', Average Precision : ' + str(ap) + '\n')
 
-        return single_video_AUC, overall_auc
+        return single_video_AUC, overall_auc, ap
 
 
 def main():
@@ -144,20 +146,20 @@ def main():
     model = Model(feature_dim=args.feature_size, batch_size=1, seg_num=args.seg_num)
     model.load_state_dict(torch.load(args.detection_model))
 
-    single_video_AUC, overall_auc = test(dataloader=test_loader,
-                                         model=model,
-                                         device=device,
-                                         gen_scores=True,
-                                         save_dir=scores_path)
+    single_video_AUC, overall_auc, ap = test(dataloader=test_loader,
+                                             model=model,
+                                             device=device,
+                                             gen_scores=True,
+                                             save_dir=scores_path)
 
     # save AUC results
     video_sub_dir = os.path.basename(os.path.dirname(single_video_AUC["video"][0][0]))
-    file_path = os.path.join(AUC_path, video_sub_dir, 'AUC.txt')
+    file_path = os.path.join(AUC_path, video_sub_dir, 'results.txt')
     os.makedirs(os.path.dirname(file_path), exist_ok=True)
     with open(file_path, "w") as f:
         for video, single_auc in zip(single_video_AUC["video"], single_video_AUC["AUC"]):
             f.write(f"Video: {video}, AUC: {single_auc}\n")
-        f.write("Overall: {}\n".format(overall_auc))
+        f.write("Overall AUC: {}, Average Precision: {}\n".format(overall_auc, ap))
 
 
 if __name__ == '__main__':

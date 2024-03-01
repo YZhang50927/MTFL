@@ -7,7 +7,7 @@ This repo is the official Pytorch implementation of our paper:
 <!--Author list-->
 
 ## Introduction
-![intro](figures/intro.png)
+![intro](figures/Intro.png)
 
 Detection of anomaly events is relevant for public safety and requires a combination of fine-grained motion information and long-time action recognition. Therefore, we propose a Multi-Timescale Feature Learning (MTFL) method to enhance the representation of anomaly features. We employ short, medium, and long temporal tubelets to extract spatio-temporal video 
 features using the Video Swin Transformer. Experimental results demonstrate that 
